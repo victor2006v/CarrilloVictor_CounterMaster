@@ -1,14 +1,14 @@
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class PlayerDetection : MonoBehaviour{
 
     private bool hasTriggered = false;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (hasTriggered) return;
+        if (!other.CompareTag("Player")) return;
 
-        if (other.CompareTag("Player")) {
+        if (this.gameObject.CompareTag("Door") && !hasTriggered) {
             Door door = GetComponentInParent<Door>();
 
             if (door != null) {
@@ -25,5 +25,11 @@ public class PlayerDetection : MonoBehaviour{
                 }
             }
         }
+        if (this.gameObject.CompareTag("Finish") && !hasTriggered) {
+            PlayerPrefs.SetInt("level", PlayerPrefs.GetInt("level") + 1);
+            SceneManager.LoadScene(0);
+            hasTriggered = true;
+        }
+
     }
 }

@@ -4,12 +4,15 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public static PlayerController Instance { get; private set; }
 
     [Header("Elements")]
     [SerializeField] private CrowdSystem crowdSystem;
+    
 
     [Header("Player Settings")]
     [SerializeField] private float moveSpeed;
+    [SerializeField] private bool canMove;
 
     [Header("Control")]
     [SerializeField] private float slideSpeed;
@@ -19,11 +22,43 @@ public class PlayerController : MonoBehaviour
 
     private float ROAD_WIDTH = 9.5f;
 
-    private void Start() { 
+    private AnimatorController animatorController;
+
+    private void Awake() {
+        if (Instance == null) Instance = this;
+        else Destroy(this.gameObject);
     }
-    private void Update() { 
-        MoveForward();
-        ManageControl();
+
+    private void Start() {
+        animatorController = GetComponent<AnimatorController>();
+        GameManager.onGameStateChanged += GameStateChangedCallback;
+    }
+
+    private void OnDestroy() {
+        GameManager.onGameStateChanged -= GameStateChangedCallback;
+    }
+
+    private void StartMoving() {
+        canMove = true;
+        animatorController.Run();
+    }
+
+    private void StopMoving() { 
+        canMove= false;
+        animatorController.Idle();
+    }
+
+    private void GameStateChangedCallback(GameManager.GameState gameState) {
+        if (gameState == GameManager.GameState.GAME) {
+            StartMoving();
+        }
+    }
+
+    private void Update() {
+        if (canMove) {
+            MoveForward();
+            ManageControl();
+        }
     }
     private void MoveForward() {
         transform.position += Vector3.forward * Time.deltaTime * moveSpeed;

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CrowdSystem : MonoBehaviour
 {
+    private AnimatorController playerAnimator;
+
     [Header("Prefab Runner")]
     [SerializeField] private GameObject runnerPrefab;
 
@@ -18,6 +20,7 @@ public class CrowdSystem : MonoBehaviour
     void Start()
     {
         PlaceCharacters();
+        playerAnimator = GetComponent<AnimatorController>();
     }
 
     // Update is called once per frame
@@ -68,6 +71,7 @@ public class CrowdSystem : MonoBehaviour
         {
             Instantiate(runnerPrefab, runnersParent);
         }
+        playerAnimator.Run();
     }
 
     private void RemoveRunners(int amount) {
